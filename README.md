@@ -23,6 +23,16 @@ A static web app for tracking the rolling schedule of a junior track meet in rea
 
 4. Open `operator.html` on the volunteer's phone, enter the PIN, and tap **Start Meet** when the first event begins.
 
+## Demo mode
+
+Add `?demo` to the spectator URL to show a pre-populated mid-meet state — useful for sharing with other organizers or testing the layout before a real meet:
+
+```
+https://yourname.github.io/repo-name/?demo
+```
+
+The demo shows event 9 of 23 running, with a scratched event in the history. It does not affect `localStorage` or real meet state.
+
 ## Local development
 
 ES modules require a server — you can't open `index.html` directly via `file://` in Chrome/Firefox.

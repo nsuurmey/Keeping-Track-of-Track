@@ -16,13 +16,24 @@
 
     document.title = MEET_CONFIG.meetName;
 
+    const IS_DEMO = new URLSearchParams(location.search).has("demo");
+
+    // Mid-meet demo state: events 1-7 done, id 8 (1500m Girls) scratched,
+    // id 9 (400m Hurdles Boys) currently running.
+    const DEMO_STATE = {
+      version: 1,
+      currentIndex: 8,
+      statuses: { 1:"done", 2:"done", 3:"done", 4:"done", 5:"done", 6:"done", 7:"done", 8:"scratched", 9:"running" },
+      lastAction: null,
+    };
+
     function genderAgeLabel(ev) {
       const parts = [ev.gender, ev.ageGroup].filter(Boolean);
       return parts.join(" · ");
     }
 
     function render() {
-      const state = loadState();
+      const state = IS_DEMO ? DEMO_STATE : loadState();
       const view = computeView(state, EVENTS, MEET_CONFIG.comingUpCount ?? 5);
       const root = document.getElementById("root");
 
@@ -87,7 +98,12 @@
           }).join("")}
         </div>` : "";
 
+      const demoBanner = IS_DEMO
+        ? `<div class="demo-banner">DEMO — this is example data</div>`
+        : "";
+
       root.innerHTML = `
+        ${demoBanner}
         <div class="page">
           <p class="meet-name">${MEET_CONFIG.meetName}</p>
           ${nowHtml}
@@ -97,8 +113,10 @@
     }
 
     render();
-    setInterval(render, (MEET_CONFIG.refreshIntervalSeconds ?? 15) * 1000);
-    window.addEventListener("storage", render);
+    if (!IS_DEMO) {
+      setInterval(render, (MEET_CONFIG.refreshIntervalSeconds ?? 15) * 1000);
+      window.addEventListener("storage", render);
+    }
   </script>
 </body>
 </html>
