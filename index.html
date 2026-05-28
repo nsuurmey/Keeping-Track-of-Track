@@ -18,12 +18,12 @@
 
     const IS_DEMO = new URLSearchParams(location.search).has("demo");
 
-    // Mid-meet demo state: events 1-7 done, id 8 (1500m Girls) scratched,
-    // id 9 (400m Hurdles Boys) currently running.
+    // Mid-meet demo: Discus/Javelin + 100m + 3000m done, 4x100 Girls scratched,
+    // 4x100 Boys currently running. Long Jump and 400m onward still to come.
     const DEMO_STATE = {
       version: 1,
-      currentIndex: 8,
-      statuses: { 1:"done", 2:"done", 3:"done", 4:"done", 5:"done", 6:"done", 7:"done", 8:"scratched", 9:"running" },
+      currentIndex: 6,
+      statuses: { 1:"done", 2:"done", 3:"done", 4:"done", 5:"done", 6:"scratched", 7:"running" },
       lastAction: null,
     };
 
