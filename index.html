@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0d0d0d" />
+  <title>Track Meet</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="module">
+    import { MEET_CONFIG, EVENTS } from "./events.js";
+    import { loadState, computeView } from "./app.js";
+
+    document.title = MEET_CONFIG.meetName;
+
+    function genderAgeLabel(ev) {
+      const parts = [ev.gender, ev.ageGroup].filter(Boolean);
+      return parts.join(" · ");
+    }
+
+    function render() {
+      const state = loadState();
+      const view = computeView(state, EVENTS, MEET_CONFIG.comingUpCount ?? 5);
+      const root = document.getElementById("root");
+
+      if (view.notStarted) {
+        root.innerHTML = `
+          <div class="page">
+            <p class="meet-name">${MEET_CONFIG.meetName}</p>
+            <div class="state-message">
+              <h2>Meet hasn't started yet</h2>
+              <p>Check back soon — the schedule will appear here once the meet begins.</p>
+            </div>
+          </div>`;
+        return;
+      }
+
+      if (view.meetFinished) {
+        root.innerHTML = `
+          <div class="page">
+            <p class="meet-name">${MEET_CONFIG.meetName}</p>
+            <div class="state-message">
+              <h2>Meet Complete</h2>
+              <p>All events have finished. Thanks for coming!</p>
+            </div>
+          </div>`;
+        return;
+      }
+
+      const nowHtml = view.runningEvent ? `
+        <div class="now-running">
+          <div class="now-label">Now Running</div>
+          <div class="now-name">${view.runningEvent.name}</div>
+          <div class="now-subtitle">${genderAgeLabel(view.runningEvent)}</div>
+        </div>
+        <div class="progress-bar-wrap">
+          <div class="progress-text">Event ${view.runningNumber} of ${view.totalActive}</div>
+          <progress value="${view.runningNumber}" max="${view.totalActive}"></progress>
+        </div>` : "";
+
+      const upNextHtml = view.upNext ? `
+        <div class="up-next">
+          <div class="up-next-label">Up Next</div>
+          <div>
+            <div class="up-next-name">${view.upNext.event.name}</div>
+            <div class="up-next-sub">${genderAgeLabel(view.upNext.event)}</div>
+          </div>
+        </div>` : "";
+
+      const comingHtml = view.coming.length ? `
+        <div class="coming-up">
+          <div class="section-label">Coming Up</div>
+          ${view.coming.map((item, i) => {
+            const isScratched = item.status === "scratched";
+            return `
+            <div class="event-row${isScratched ? " scratched" : ""}">
+              <div class="event-index">${view.runningNumber + 1 + i + 1}</div>
+              <div class="event-info">
+                <div class="event-name">${item.event.name}</div>
+                <div class="event-sub">${genderAgeLabel(item.event)}</div>
+              </div>
+              ${isScratched ? '<span class="scratch-badge">Scratched</span>' : ""}
+            </div>`;
+          }).join("")}
+        </div>` : "";
+
+      root.innerHTML = `
+        <div class="page">
+          <p class="meet-name">${MEET_CONFIG.meetName}</p>
+          ${nowHtml}
+          ${upNextHtml}
+          ${comingHtml}
+        </div>`;
+    }
+
+    render();
+    setInterval(render, (MEET_CONFIG.refreshIntervalSeconds ?? 15) * 1000);
+    window.addEventListener("storage", render);
+  </script>
+</body>
+</html>
