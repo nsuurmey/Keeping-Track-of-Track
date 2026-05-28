@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0d0d0d" />
+  <title>Operator — Track Meet</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="module">
+    import { MEET_CONFIG, EVENTS } from "./events.js";
+    import {
+      loadState, saveState, computeView,
+      startMeet, markComplete, skipEvent, undo, resetMeet,
+    } from "./app.js";
+
+    document.title = `Operator — ${MEET_CONFIG.meetName}`;
+
+    // ── Auth ─────────────────────────────────────────────────────────────
+
+    function isAuthed() {
+      return sessionStorage.getItem("operatorAuthed") === "true";
+    }
+
+    function renderPinScreen(errorMsg = "") {
+      document.getElementById("root").innerHTML = `
+        <div class="pin-screen">
+          <h1>Meet Operator</h1>
+          <p>${MEET_CONFIG.meetName}</p>
+          <input
+            id="pin-input"
+            class="pin-input"
+            type="tel"
+            inputmode="numeric"
+            maxlength="4"
+            placeholder="PIN"
+            autocomplete="off"
+            autofocus
+          />
+          ${errorMsg ? `<p style="color:#dc2626;font-size:0.9rem;">${errorMsg}</p>` : ""}
+        </div>`;
+
+      const input = document.getElementById("pin-input");
+      input.focus();
+      input.addEventListener("input", () => {
+        if (input.value.length === 4) checkPin(input.value);
+      });
+    }
+
+    function checkPin(value) {
+      if (value === String(MEET_CONFIG.operatorPin)) {
+        sessionStorage.setItem("operatorAuthed", "true");
+        renderPanel();
+      } else {
+        const input = document.getElementById("pin-input");
+        input.classList.add("shake");
+        input.addEventListener("animationend", () => {
+          input.classList.remove("shake");
+          input.value = "";
+          input.focus();
+        }, { once: true });
+      }
+    }
+
+    // ── Panel ─────────────────────────────────────────────────────────────
+
+    function genderAgeLabel(ev) {
+      return [ev.gender, ev.ageGroup].filter(Boolean).join(" · ");
+    }
+
+    function dispatch(action) {
+      let state = loadState();
+      switch (action) {
+        case "start":  state = startMeet(state, EVENTS);   break;
+        case "done":   state = markComplete(state, EVENTS); break;
+        case "skip":   state = skipEvent(state, EVENTS);    break;
+        case "undo":   state = undo(state, EVENTS);         break;
+        case "reset":
+          if (!confirm("Reset the meet? This will clear all progress.")) return;
+          state = resetMeet();
+          break;
+      }
+      saveState(state);
+      renderPanel();
+    }
+
+    function renderPanel() {
+      const state = loadState();
+      const view = computeView(state, EVENTS, MEET_CONFIG.comingUpCount ?? 5);
+      const root = document.getElementById("root");
+
+      const notStarted = view.notStarted;
+      const finished = view.meetFinished;
+
+      const statusBlock = notStarted
+        ? `<div class="op-status">
+             <div class="op-status-label">Status</div>
+             <div class="op-status-name">Not started</div>
+             <div class="op-status-sub">${EVENTS.length} events scheduled</div>
+           </div>`
+        : finished
+        ? `<div class="op-status">
+             <div class="op-status-label">Status</div>
+             <div class="op-status-name">Meet Complete</div>
+           </div>`
+        : `<div class="op-status">
+             <div class="op-status-label">Now Running</div>
+             <div class="op-status-name">${view.runningEvent.name}</div>
+             <div class="op-status-sub">${genderAgeLabel(view.runningEvent)}</div>
+             <div class="op-progress">Event ${view.runningNumber} of ${view.totalActive}</div>
+           </div>`;
+
+      const upNextBlock = view.upNext && !notStarted && !finished
+        ? `<div class="op-next-label">Up Next</div>
+           <div class="op-next-event">
+             ${view.upNext.event.name}
+             <span>— ${genderAgeLabel(view.upNext.event)}</span>
+           </div>`
+        : "";
+
+      const mainBtn = notStarted
+        ? `<button class="btn btn-primary" data-action="start">Start Meet</button>`
+        : finished
+        ? ``
+        : `<button class="btn btn-primary" data-action="done">&#10003; Mark Complete</button>`;
+
+      const secondaryBtns = (!notStarted && !finished)
+        ? `<div class="btn-row">
+             <button class="btn btn-secondary" data-action="undo" ${!view.canUndo ? "disabled" : ""}>&#8592; Undo</button>
+             <button class="btn btn-secondary" data-action="skip">&#x23ED; Skip</button>
+           </div>`
+        : "";
+
+      const resetBtn = `<button class="btn btn-danger" data-action="reset">Reset Meet</button>`;
+
+      root.innerHTML = `
+        <div class="operator-page">
+          <div class="op-header">
+            <h1>Meet Operator</h1>
+            <div class="meet-name-op">${MEET_CONFIG.meetName}</div>
+          </div>
+          ${statusBlock}
+          ${upNextBlock}
+          ${mainBtn}
+          ${secondaryBtns}
+          ${resetBtn}
+        </div>`;
+
+      root.querySelectorAll("[data-action]").forEach((btn) => {
+        btn.addEventListener("click", () => dispatch(btn.dataset.action));
+      });
+    }
+
+    // ── Boot ──────────────────────────────────────────────────────────────
+
+    if (isAuthed()) {
+      renderPanel();
+    } else {
+      renderPinScreen();
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+export const MEET_CONFIG = {
+  meetName: "Spring Invitational 2026",
+  operatorPin: "1234",
+  refreshIntervalSeconds: 15,
+  comingUpCount: 5,
+};
+
+export const EVENTS = [
+  { id: 1,  name: "4x800m Relay",      gender: "Boys",  ageGroup: "Varsity", estimatedDuration: 12 },
+  { id: 2,  name: "4x800m Relay",      gender: "Girls", ageGroup: "Varsity", estimatedDuration: 12 },
+  { id: 3,  name: "110m Hurdles",      gender: "Boys",  ageGroup: "Varsity", estimatedDuration: 8  },
+  { id: 4,  name: "100m Hurdles",      gender: "Girls", ageGroup: "Varsity", estimatedDuration: 8  },
+  { id: 5,  name: "100m Dash",         gender: "Boys",  ageGroup: "Varsity", estimatedDuration: 10 },
+  { id: 6,  name: "100m Dash",         gender: "Girls", ageGroup: "Varsity", estimatedDuration: 10 },
+  { id: 7,  name: "1500m Run",         gender: "Boys",  ageGroup: "Varsity", estimatedDuration: 15 },
+  { id: 8,  name: "1500m Run",         gender: "Girls", ageGroup: "Varsity", estimatedDuration: 15 },
+  { id: 9,  name: "400m Hurdles",      gender: "Boys",  ageGroup: "Varsity", estimatedDuration: 10 },
+  { id: 10, name: "400m Hurdles",      gender: "Girls", ageGroup: "Varsity", estimatedDuration: 10 },
+  { id: 11, name: "400m Dash",         gender: "Boys",  ageGroup: "Varsity", estimatedDuration: 10 },
+  { id: 12, name: "400m Dash",         gender: "Girls", ageGroup: "Varsity", estimatedDuration: 10 },
+  { id: 13, name: "300m Hurdles",      gender: "Boys",  ageGroup: "JV",      estimatedDuration: 8  },
+  { id: 14, name: "300m Hurdles",      gender: "Girls", ageGroup: "JV",      estimatedDuration: 8  },
+  { id: 15, name: "800m Run",          gender: "Boys",  ageGroup: "Varsity", estimatedDuration: 12 },
+  { id: 16, name: "800m Run",          gender: "Girls", ageGroup: "Varsity", estimatedDuration: 12 },
+  { id: 17, name: "200m Dash",         gender: "Boys",  ageGroup: "Varsity", estimatedDuration: 10 },
+  { id: 18, name: "200m Dash",         gender: "Girls", ageGroup: "Varsity", estimatedDuration: 10 },
+  { id: 19, name: "3200m Run",         gender: "Boys",  ageGroup: "Varsity", estimatedDuration: 18 },
+  { id: 20, name: "3200m Run",         gender: "Girls", ageGroup: "Varsity", estimatedDuration: 18 },
+  { id: 21, name: "4x400m Relay",      gender: "Boys",  ageGroup: "Varsity", estimatedDuration: 10 },
+  { id: 22, name: "4x400m Relay",      gender: "Girls", ageGroup: "Varsity", estimatedDuration: 10 },
+  { id: 23, name: "4x100m Relay",      gender: "Boys",  ageGroup: "Varsity", estimatedDuration: 8  },
+  { id: 24, name: "4x100m Relay",      gender: "Girls", ageGroup: "Varsity", estimatedDuration: 8  },
+];
